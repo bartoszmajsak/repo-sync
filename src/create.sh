@@ -91,8 +91,8 @@ while test $# -gt 0; do
 done
 
 GITHUB_TOKEN="${GITHUB_TOKEN:-$gh_token}"
-if [[ -z $GITHUB_TOKEN ]]; then
-  echo "Please provide GITHUB_TOKEN environment variable (or pass using --token flag ${gh_token})" && exit 1
+if [[ -z $GITHUB_TOKEN || $GITHUB_TOKEN == "null" ]]; then
+  echo "Please provide GITHUB_TOKEN environment variable (or pass using --token flag)" && exit 1
 fi
 
 TMP_DIR=$(mktemp -d -t "patchset.XXXXXXXXXX")
