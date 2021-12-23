@@ -1,0 +1,3 @@
+= Repo Synchronizer
+
+Ensures that main development stream can be safely merged with long-living topic branch.
