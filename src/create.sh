@@ -26,11 +26,6 @@ patchset_dir="${PATCHSET_DIR:-patchset}"
 
 gh_token="null"
 
-if [[ "$#" -eq 0 ]]; then
-  show_help
-  exit 0
-fi
-
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
@@ -111,11 +106,11 @@ patchset_dir=$(pwd)/patchset
 mkdir source_repo
 source_repo_dir=$(pwd)/source_repo
 
-git clone "https://oauth2:${GITHUB_TOKEN}@${patchset_repo}.git" "${patchset_dir}" 
 configure_git "${patchset_dir}"
-
-git clone "https://oauth2:${GITHUB_TOKEN}@${source_repo}.git" "${source_repo_dir}" 
 configure_git "${source_repo_dir}"
+
+git clone "https://oauth2:${GITHUB_TOKEN}@${patchset_repo}.git" "${patchset_dir}" 
+git clone "https://oauth2:${GITHUB_TOKEN}@${source_repo}.git" "${source_repo_dir}" 
 
 cd "${source_repo_dir}"
 
@@ -132,7 +127,6 @@ else
   total_commits=${total_commits##+(0)}
   start_from=$((total_commits - patches))
   skipInDryRun git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" -o "${patchset_dir}/${dev_branch}"  
-  echo "commits: ${total_commits}, start from: ${start_from}, patches: ${patches}"
 fi 
 
 cd "${patchset_dir}"
