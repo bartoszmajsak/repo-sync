@@ -9,8 +9,8 @@ RUN dnf -y update && \
     dnf -y install git && \
     dnf -y clean all
 
-ADD func.sh /usr/local/bin/func.sh
-ADD create.sh /usr/local/bin/create_patches
+COPY func.sh /usr/local/bin/func.sh
+COPY create.sh /usr/local/bin/create_patches
 RUN chmod +x /usr/local/bin/create_patches
 
 RUN mkdir -p /work && chmod 777 /work

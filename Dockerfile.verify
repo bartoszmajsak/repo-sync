@@ -16,8 +16,8 @@ RUN curl -sfLO https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${
     mv gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin && chown root.root /usr/local/bin/gh && \
     rm -rf /root/* /root/.cache /tmp/*
 
-ADD func.sh /usr/local/bin/func.sh
-ADD verify.sh /usr/local/bin/verify_patches
+COPY func.sh /usr/local/bin/func.sh
+COPY verify.sh /usr/local/bin/verify_patches
 RUN chmod +x /usr/local/bin/verify_patches
 
 RUN mkdir -p /work && chmod 777 /work
