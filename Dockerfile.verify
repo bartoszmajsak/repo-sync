@@ -6,7 +6,7 @@ ENV CI prow
 
 # Install all dependencies available in RPM repos
 RUN dnf -y update && \
-    dnf -y install git && \
+    dnf -y install git-2.31.1 && \
     dnf -y clean all
 
 # GH CLI

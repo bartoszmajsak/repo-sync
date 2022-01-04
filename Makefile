@@ -23,7 +23,13 @@ modules:
 
 .PHONY: test
 test:
+	$(call header,"Running tests")
 	$(PROJECT_DIR)/test/bats/bin/bats test/*.bats
+
+.PHONY: lint
+lint:
+	$(call header,"Running linters")
+	hadolint Dockerfile.*
 
 ##@ Images
 
