@@ -29,6 +29,7 @@ test:
 .PHONY: lint
 lint:
 	$(call header,"Running linters")
+	shellcheck -a --severity=error src/**
 	hadolint Dockerfile.*
 
 ##@ Images
