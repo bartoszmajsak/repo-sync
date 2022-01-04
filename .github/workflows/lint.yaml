@@ -20,9 +20,9 @@ jobs:
         uses: tj-actions/changed-files@v12
         with:
           files: |
-            **/Dockerfile*
+            ^Dockerfile.*$
           separator: " "
       - uses: jbergstroem/hadolint-gh-action@v1
         if: steps.changed-files.outputs.any_changed == 'true'
         with:
-          dockerfile: "${{ steps.changed-files.outputs.other_changed_files }}"
+          dockerfile: "${{ steps.changed-files.outputs.all_changed_files }}"
