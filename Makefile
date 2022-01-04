@@ -12,14 +12,18 @@ endef
 ##@ Default target (all you need - just run "make")
 .DEFAULT_GOAL:=all
 .PHONY: all
-all: container-images
+all: test container-images
 
 .PHONY: modules
 modules:
 	git submodule init
 	git submodule update
 
-##@ Build
+##@ Source
+
+.PHONY: test
+test:
+	$(PROJECT_DIR)/test/bats/bin/bats test/*.bats
 
 ##@ Images
 
