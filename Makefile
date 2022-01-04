@@ -16,15 +16,14 @@ all: test container-images
 
 .PHONY: modules
 modules:
-	git submodule init
 	git submodule update
 
 ##@ Source
 
 .PHONY: test
-test:
+test: modules
 	$(call header,"Running tests")
-	$(PROJECT_DIR)/test/bats/bin/bats test/*.bats
+	./test/bats/bin/bats test/*.bats
 
 .PHONY: lint
 lint:
