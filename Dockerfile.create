@@ -1,9 +1,5 @@
 FROM quay.io/centos/centos:stream8
 
-# Set CI variable which can be checked by test scripts to verify
-# if running in the continuous integration environment.
-ENV CI prow
-
 # Install all dependencies available in RPM repos
 RUN dnf -y update && \
     dnf -y install git-2.31.1 && \
