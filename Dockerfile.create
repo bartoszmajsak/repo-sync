@@ -1,6 +1,5 @@
-FROM quay.io/centos/centos:stream8
+FROM quay.io/centos/centos:stream9
 
-# Install all dependencies available in RPM repos
 RUN dnf -y update && \
     dnf -y install git-2.31.1 && \
     dnf -y clean all
