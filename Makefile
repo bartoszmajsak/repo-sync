@@ -14,6 +14,11 @@ endef
 .PHONY: all
 all: container-images
 
+.PHONY: modules
+modules:
+	git submodule init
+	git submodule update
+
 ##@ Build
 
 ##@ Images
