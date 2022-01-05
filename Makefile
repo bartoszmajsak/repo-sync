@@ -14,14 +14,15 @@ endef
 .PHONY: all
 all: test container-images
 
-.PHONY: modules
-modules:
+.PHONY: init
+init:
+	git submodule init
 	git submodule update
 
 ##@ Source
 
 .PHONY: test
-test: modules
+test:
 	$(call header,"Running tests")
 	./test/bats/bin/bats test/*.bats
 

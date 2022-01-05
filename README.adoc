@@ -1,3 +1,8 @@
 = Repo Synchronizer
 
 Ensures that main development stream can be safely merged with long-living topic branch.
+
+
+== Contribution
+
+NOTE: As we rely on git submodules please make sure to run `make init` after cloning repository.
