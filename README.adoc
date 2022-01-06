@@ -2,7 +2,42 @@
 
 Ensures that main development stream can be safely merged with long-living topic branch.
 
+== Key concepts
+
+=== Development stream branch
+
+Branch where current development of downstream is taking place (conceptually similar to long-lived topic branch)
+
+=== Patch Set
+
+Ordered list of patches stored in the dedicated repository in the directory corresponding to the source branch.
+
+It's intended to be used for validation of incoming changes on the main development branch.
+
+== Features
+
+=== Initial patch list creation
+
+Every time a new development stream starts (new default branch) it recreates the patches based on the previous stream.
+
+===  Patch updates
+
+This component observes changes in the `development stream branch` and creates new patches from them. Those will be then used to early detect conflicts when applied to the main branch which is synced with upstream.
+
+=== Patch verification
+
+Whenever new changes from upstream repository are synced with the main branch, list of patches are applied against them. This way it can detect issues early on.
+
+In case of failure a new PR is opened which consists of successfully applied patches, details about the errors and instructions how to work on conflict resolution.
+
+Once the conflict is resolved the verification continues on the same pull request branch.
+
+In case of the success for the entire patch list, the pull request is closed and verified commit is marked as healthy (green check on GitHub).
+
+== Implementation using Prow 
+
+*WIP*
 
 == Contribution
 
-NOTE: As we rely on git submodules please make sure to run `make init` after cloning repository.
+NOTE: As this solution relies on git submodules for testing, please make sure to run `make init` after cloning repository.
