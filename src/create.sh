@@ -8,17 +8,9 @@ set -euo pipefail
 source "${DIR}/func.sh"
 dryRun=false
 
-show_help() {
-  echo "create - ..."
-  echo " "
-  echo "./create.sh [flags|version]"
-  echo " "
-  echo "Options:"
-}
-
 source_repo="${SOURCE_REPO:-}" # required
 
-main="${MAIN_BRANCH:-master}"
+main="${MAIN_BRANCH:-main}"
 dev_branch="${DEV_BRANCH:-dev}"
 
 patchset_repo="${PATCHSET_REPO:-}" # required
@@ -29,7 +21,7 @@ gh_token="null"
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
-            show_help
+            show_help "creates patches from commits on the development branch and pushes them to dedicated repository"
             exit 0
             ;;
     -m)

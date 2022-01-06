@@ -8,14 +8,6 @@ set -euo pipefail
 source "${DIR}/func.sh"
 dryRun=false
 
-show_help() {
-  echo "validate - ..."
-  echo " "
-  echo "./validate.sh [flags|version]"
-  echo " "
-  echo "Options:"
-}
-
 source_repo="${SOURCE_REPO:-}" # required
 current_branch="${CURRENT_BRANCH:-dev}" # TODO validate
 
@@ -32,7 +24,7 @@ fi
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
-            show_help
+            show_help "continues patch verification process after conflicts are resolved"
             exit 0
             ;;   
     --branch*)
