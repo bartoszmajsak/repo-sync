@@ -1,0 +1,25 @@
+presubmits:
+
+  org/repo:
+    - name: patch-fix-validation
+      trigger: "(?m)^/resolved"
+      rerun_command: "/resolved"
+      decorate: true
+      always_run: false
+      optional: false
+      spec:
+        containers:
+          - image: "quay.io/bmajsak/prow-validate-patch:latest"
+            imagePullPolicy: Always
+            env:
+              # TODO: take from e.g. secrets. These are required
+              - name: "GITHUB_TOKEN"
+                value: "ghp_TOKEN"
+              - name: "GIT_USER"
+                value: "git-user"
+              - name: "GIT_EMAIL"
+                value: "git-email@mail.com"
+            command: ["validate"]
+            args:
+            - "--repo=github.com/org/repo"
+            - "--patchset=github.com/org/patchset-repo"
