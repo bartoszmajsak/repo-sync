@@ -97,11 +97,11 @@ git clone "https://oauth2:${GITHUB_TOKEN}@${patchset_repo}.git" "${patchset_dir}
 configure_git "${patchset_dir}"
 
 git clone "https://oauth2:${GITHUB_TOKEN}@${source_repo}.git" "${source_repo_dir}" 
-
-cd "${source_repo_dir}"
 configure_git "${source_repo_dir}"
 
 ## Start patch process
+
+cd "${source_repo_dir}"
 
 export PAGER=more
 repo_slug="${source_repo#*/}"
@@ -208,3 +208,5 @@ EOF
 
 skipInDryRun gh api --silent --method DELETE repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels/"${label}"
 skipInDryRun gh pr close "${PULL_NUMBER}"
+
+### TODO remove branches

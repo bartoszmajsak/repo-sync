@@ -28,7 +28,6 @@ configure_git() {
   cd - || exit
 }
 
-
 show_help() {
   usage="
 $(basename "$0") - $1

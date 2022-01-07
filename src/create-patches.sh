@@ -98,11 +98,11 @@ patchset_dir=$(pwd)/patchset
 mkdir source_repo
 source_repo_dir=$(pwd)/source_repo
 
-configure_git "${patchset_dir}"
-configure_git "${source_repo_dir}"
-
 git clone "https://oauth2:${GITHUB_TOKEN}@${patchset_repo}.git" "${patchset_dir}" 
-git clone "https://oauth2:${GITHUB_TOKEN}@${source_repo}.git" "${source_repo_dir}" 
+configure_git "${patchset_dir}"
+
+git clone "https://oauth2:${GITHUB_TOKEN}@${source_repo}.git" "${source_repo_dir}"
+configure_git "${source_repo_dir}"
 
 cd "${source_repo_dir}"
 

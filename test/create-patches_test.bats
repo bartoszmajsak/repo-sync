@@ -29,7 +29,7 @@ script_under_test="create-patches.sh"
     run $script_under_test
     
     # then
-    assert_output 'Please provide GITHUB_TOKEN environment variable (or pass using --token flag)'
+    assert_line 'Please provide GITHUB_TOKEN environment variable (or pass using --token flag)'
     assert_failure
 }
 
@@ -43,7 +43,7 @@ script_under_test="create-patches.sh"
     run $script_under_test
     
     # then
-    assert_output 'Please provide GIT_USER environment variable'
+    assert_line 'Please provide GIT_USER environment variable'
     assert_failure
 }
 
@@ -58,7 +58,7 @@ script_under_test="create-patches.sh"
     run $script_under_test
     
     # then
-    assert_output 'Please provide GIT_EMAIL environment variable'
+    assert_line 'Please provide GIT_EMAIL environment variable'
     assert_failure
 }
 
