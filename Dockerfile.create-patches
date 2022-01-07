@@ -5,12 +5,12 @@ RUN dnf -y update && \
     dnf -y clean all
 
 COPY func.sh /usr/local/bin/func.sh
-COPY create.sh /usr/local/bin/create_patches
-RUN chmod +x /usr/local/bin/create_patches
+COPY create-patches.sh /usr/local/bin/create-patches
+RUN chmod +x /usr/local/bin/create-patches
 
 RUN mkdir -p /work && chmod 777 /work
 WORKDIR /work
 
 ENV HOME /work
 
-ENTRYPOINT ["create_patches"]
+ENTRYPOINT ["create-patches"]

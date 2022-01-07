@@ -48,9 +48,9 @@ else
 endif
 
 .PHONY: container-images
-container-images: container-image--create ## Builds container images
-container-images: container-image--validate
-container-images: container-image--verify
+container-images: container-image--create-patches ## Builds container images
+container-images: container-image--validate-resolution
+container-images: container-image--check-conflicts
 
 CONTAINER_REGISTRY?=quay.io
 CONTAINER_REPOSITORY?=bmajsak
@@ -59,7 +59,7 @@ container-image--%: ## Builds the container image
 	$(eval image_param=$(subst container-image--,,$@))
 	$(eval image_type=$(firstword $(subst @, ,$(image_param))))
 	$(eval image_tag=$(or $(word 2,$(subst @, ,$(image_param))),latest))
-	$(eval image_name:=prow-${image_type}-patch)
+	$(eval image_name:=prow-${image_type})
 	$(call header,"Building container image $(image_name)")
 	$(IMG_BUILDER) build \
 		--label "org.opencontainers.image.title=$(image_name)" \
@@ -75,15 +75,15 @@ container-image--%: ## Builds the container image
 
 .PHONY: container-images-push
 container-images-push: container-images ## Pushes latest container images to the registry
-container-images-push: container-push--create@latest
-container-images-push: container-push--validate@latest
-container-images-push: container-push--verify@latest
+container-images-push: container-push--create-patches@latest
+container-images-push: container-push--validate-resolution@latest
+container-images-push: container-push--check-conflicts@latest
 
 container-push--%:
 	$(eval image_param=$(subst container-push--,,$@))
 	$(eval image_type=$(firstword $(subst @, ,$(image_param))))
 	$(eval image_tag=$(or $(word 2,$(subst @, ,$(image_param))),latest))
-	$(eval image_name:=prow-${image_type}-patch)
+	$(eval image_name:=prow-${image_type})
 	$(call header,"Pushing container image $(image_name)")
 	$(IMG_BUILDER) push $(CONTAINER_REGISTRY)/$(CONTAINER_REPOSITORY)/$(image_name):$(image_tag)
 

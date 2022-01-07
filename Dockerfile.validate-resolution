@@ -1,7 +1,7 @@
 FROM quay.io/centos/centos:stream9
 
 RUN dnf -y update && \
-    dnf -y install git-2.31.1 && \
+    dnf -y install git-2.31.1 jq-1.6 && \
     dnf -y clean all
 
 ENV GH_VERSION=2.4.0
@@ -11,12 +11,12 @@ RUN curl -sfLO https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${
     rm -rf /root/* /root/.cache /tmp/*
 
 COPY func.sh /usr/local/bin/func.sh
-COPY verify.sh /usr/local/bin/verify_patches
-RUN chmod +x /usr/local/bin/verify_patches
+COPY validate-resolution.sh /usr/local/bin/validate-resolution
+RUN chmod +x /usr/local/bin/validate-resolution
 
 RUN mkdir -p /work && chmod 777 /work
 WORKDIR /work
 
 ENV HOME /work
 
-ENTRYPOINT ["verify_patches"]
+ENTRYPOINT ["validate-resolution"]

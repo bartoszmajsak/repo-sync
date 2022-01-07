@@ -18,13 +18,15 @@ function git() {
     echo "git ${*}"
 }
 
+script_under_test="create-patches.sh"
+
 @test "should fail when github token is not provided" {
     # given
     unset GH_TOKEN
     unset GITHUB_TOKEN
         
     # when
-    run create.sh
+    run $script_under_test
     
     # then
     assert_output 'Please provide GITHUB_TOKEN environment variable (or pass using --token flag)'
@@ -38,7 +40,7 @@ function git() {
     export GITHUB_TOKEN="1231232"
     
     # when
-    run create.sh
+    run $script_under_test
     
     # then
     assert_output 'Please provide GIT_USER environment variable'
@@ -53,7 +55,7 @@ function git() {
     export GIT_USER="git-bot"
     
     # when
-    run create.sh
+    run $script_under_test
     
     # then
     assert_output 'Please provide GIT_EMAIL environment variable'
@@ -73,7 +75,7 @@ function git() {
     export GIT_EMAIL="git@github.com"
     
     # when
-    run create.sh
+    run $script_under_test
     
     # then
     assert_line 'git config --local user.name git-bot'

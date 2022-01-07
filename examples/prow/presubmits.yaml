@@ -9,7 +9,7 @@ presubmits:
       optional: false
       spec:
         containers:
-          - image: "quay.io/bmajsak/prow-validate-patch:latest"
+          - image: "quay.io/bmajsak/prow-validate-resolution:latest"
             imagePullPolicy: Always
             env:
               # TODO: take from e.g. secrets. These are required
@@ -19,7 +19,7 @@ presubmits:
                 value: "git-user"
               - name: "GIT_EMAIL"
                 value: "git-email@mail.com"
-            command: ["validate"]
+            command: ["validate-resolution"]
             args:
             - "--repo=github.com/org/repo"
             - "--patchset=github.com/org/patchset-repo"

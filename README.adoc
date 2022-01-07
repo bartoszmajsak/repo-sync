@@ -36,7 +36,7 @@ In case of the success for the entire patch list, the pull request is closed and
 
 == Implementation using Prow 
 
-*WIP*
+See pre- and post-submit jobs in `examples/prow` directory for details.
 
 == Contribution
 

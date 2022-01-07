@@ -12,7 +12,7 @@ postsubmits:
         - ^release-.*$
       spec:
         containers:
-          - image: "quay.io/bmajsak/prow-create-patch:latest"
+          - image: "quay.io/bmajsak/prow-create-patches:latest"
             imagePullPolicy: Always
             env:
               # TODO: take from e.g. secrets. These are required
@@ -22,13 +22,13 @@ postsubmits:
                 value: "git-user"
               - name: "GIT_EMAIL"
                 value: "git-email@mail.com"
-            command: ["create_patches"]
+            command: ["create-patches"]
             args:
             - "--repo=github.com/org/repo"
             - "--patchset=github.com/org/patchset-repo"
             - "--dev=release-2.1" 
   
-    - name: patchset-verifier
+    - name: check-upstream-conflicts
       decorate: true
       decoration_config:
         skip_cloning: true
@@ -39,7 +39,7 @@ postsubmits:
         - ^main$
       spec:
         containers:
-          - image: "quay.io/bmajsak/prow-verify-patch:latest"
+          - image: "quay.io/bmajsak/prow-check-conflicts:latest"
             imagePullPolicy: Always
             env:
               # TODO: take from e.g. secrets. These are required
@@ -49,7 +49,7 @@ postsubmits:
                 value: "git-user"
               - name: "GIT_EMAIL"
                 value: "git-email@mail.com"
-            command: ["verify_patches"]
+            command: ["check-conflicts"]
             args:
             - "--repo=github.com/org/repo"
             - "--patchset=github.com/org/patchset-repo"
