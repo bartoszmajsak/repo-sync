@@ -106,7 +106,6 @@ configure_git "${source_repo_dir}"
 export PAGER=more
 repo_slug="${source_repo#*/}"
 
-## TODO check if it contains required label
 pr=$(gh api repos/"${repo_slug}"/pulls/"${PULL_NUMBER}")
 
 current_branch=$(jq -r '.head.ref' - << EOF
@@ -122,7 +121,7 @@ EOF
 )
 
 if [[ -z $label ]]; then
-  echo "Pull request does not have label starting with 'patch/'. Please check if it's set up correctly." && exit 1
+  die "Pull request does not have label starting with 'patch/'. Please check if it's set up correctly."
 fi
 
 label_prefix=${label#*/}
@@ -179,13 +178,16 @@ Apply the patch from the patchset repository
 
 \`\`\`
 $ curl -L ${patch_raw_url}  | git am -k -3 
-\`\`\`
+\`\`\`  
 
 resolve the conflict and push back to the branch as a single commit.
 
 EOF
-        patch_label="patch/${patch_branch}/${patch_name%%-*}"        
+        patch_label="patch/${patch_branch}/${patch_name%%-*}"
+        # remove old label        
         skipInDryRun gh api --silent --method DELETE repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels/"${label}"
+        skipInDryRun gh api --silent --method DELETE repos/"${repo_slug}"/labels/"${label}"
+        # mark currently failing patch through new label
         skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || true
         skipInDryRun gh api --silent --method POST repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels --input - <<EOF
 { "labels": ["${patch_label}"] }
@@ -205,5 +207,4 @@ EOF
 ### Remove remaining patch label
 
 skipInDryRun gh api --silent --method DELETE repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels/"${label}"
-
 skipInDryRun gh pr close "${PULL_NUMBER}"
