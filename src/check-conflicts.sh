@@ -128,7 +128,7 @@ for patch in "${patchset_dir}/${dev_branch}/"*.patch
 do
     [[ -e "${patch}" ]] || break  # handle the case of no *.patch files
     patch_name=$(basename "${patch}")
-    patch_raw_url="https://${patchset_repo}/blob/${MAIN_BRANCH}/${dev_branch}/${patch_name}?raw=true"
+    patch_raw_url="https://${patchset_repo}/blob/main/${dev_branch}/${patch_name}?raw=true"
     set +e ## turn off exit on error to capture git am failure.. any other way?
     echo "Applying ${patch}"
     apply_status="$(git am "${patch}" -k -3 2>&1)"
@@ -157,7 +157,7 @@ do
           --body-file - << EOF 
 ## Why this PR?
 
-This pull request is indented for resolving conflicts between \`upstream/${MAIN_BRANCH}\` and changes done on ongoing development branch \`${dev_branch}\`.
+This pull request is indented for resolving conflicts between \`upstream/${main}\` and changes done on ongoing development branch \`${dev_branch}\`.
 
 ### Resolving the conflict
 
@@ -177,7 +177,7 @@ Now you can continue verification process by invoking one of the commands:
  * \`/lint\` will run perform lint checks on the code
  * \`/resolved\` will update the patch in the patchset and continue verification process if there are more patches.
 
-You can find all the relevant patches in [patchset](https://${patchset_repo}/tree/${MAIN_BRANCH}/${dev_branch}) repository.
+You can find all the relevant patches in [patchset](https://${patchset_repo}/tree/main/${dev_branch}) repository.
 
 ## Details
 
