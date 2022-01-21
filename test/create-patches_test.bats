@@ -18,6 +18,10 @@ function git() {
     echo "git ${*}"
 }
 
+function gh() {
+    echo "gh ${*}"
+}
+
 script_under_test="create-patches.sh"
 
 @test "should fail when github token is not provided" {
@@ -67,7 +71,7 @@ script_under_test="create-patches.sh"
     function find() {
         echo "0001-patch-1"
     }
-    export -f git find
+    export -f git find gh
 
     # given
     export GITHUB_TOKEN="1231232"
