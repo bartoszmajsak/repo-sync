@@ -11,7 +11,7 @@ dryRun=false
 source_repo="${SOURCE_REPO:-}" # required
 
 main="${MAIN_BRANCH:-main}"
-dev_branch="${DEV_BRANCH:-dev}"
+dev_branch="${DEV_BRANCH:-"_______undefined"}"
 
 patchset_repo="${PATCHSET_REPO:-}" # required
 patchset_dir="${PATCHSET_DIR:-patchset}"
@@ -106,6 +106,12 @@ configure_git "${source_repo_dir}"
 
 cd "${source_repo_dir}"
 
+if [[ "${dev_branch}" == "_______undefined" ]]; then
+  repo_slug="${source_repo#*/}"
+  dev_branch=$(gh api repos/"${repo_slug}" -q '.default_branch')
+fi
+
+git checkout "${main}"
 git checkout "${dev_branch}"
 
 patches=$(find "${patchset_dir}/${dev_branch}/" -maxdepth 1 -name '*.patch'| wc -l)
