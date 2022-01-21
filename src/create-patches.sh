@@ -118,8 +118,8 @@ patches=$(find "${patchset_dir}/${dev_branch}/" -maxdepth 1 -name '*.patch'| wc 
 patches=${patches##+(0)}
 
 if [ "${patches}" -eq 0 ]; then
-  first_commit=$(git log "${main}".."${dev_branch}" --oneline --pretty=format:'%h' | tail -1) 
-  git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${dev_branch}"  
+  first_commit=$(git log "${main}".."${dev_branch}" --oneline --pretty=format:'%h' | tail -1)
+  skipInDryRun git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${dev_branch}"
 else  
   total_commits=$(git rev-list --no-merges --count "${main}"..)
   total_commits=${total_commits##+(0)}
