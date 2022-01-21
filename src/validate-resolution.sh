@@ -127,7 +127,7 @@ fi
 label_prefix=${label#*/}
 patch_branch=${label_prefix%/*}
 failed_patch_nr=${label##*/}
-failed_patch_nr=${failed_patch_nr##+(0)}
+failed_patch_nr=$((10#$failed_patch_nr))
 
 ### update resolved patch
 
@@ -137,6 +137,7 @@ cd "${source_repo_dir}"
 
 patches=$(find "${patchset_dir}/${patch_branch}/" -maxdepth 1 -name '*.patch')
 total_patches=$(echo "${patches}" | wc -l)
+
 
 ### continue applying existing patches
 for patch in $(echo "${patches}" | sort | tail -"$((total_patches - failed_patch_nr + 1))")
