@@ -169,7 +169,8 @@ This pull request is indented for resolving conflicts between \`upstream/${main}
 Apply the patch from the patchset repository
 
 \`\`\`
-$ curl -L ${patch_raw_url}  | git am -k -3 
+git checkout ${patch_branch}
+curl -L ${patch_raw_url}  | git am -k -3 
 \`\`\`
 
 resolve the conflict and push back to the branch as a single commit.
