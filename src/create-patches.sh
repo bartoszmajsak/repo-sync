@@ -120,7 +120,9 @@ patches=${patches##+(0)}
 
 if [ "${patches}" -eq 0 ]; then
   first_commit=$(git log "${main}".."${dev_branch}" --oneline --pretty=format:'%h' | tail -1)
-  skipInDryRun git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${dev_branch}"
+  if [ "$(echo "${first_commit}" | tr -d '[:space:]' | wc -l)" -gt 0 ]; then
+    skipInDryRun git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${dev_branch}"
+  fi
 else  
   total_commits=$(git rev-list --no-merges --count "${main}"..)
   total_commits=${total_commits##+(0)}
@@ -129,7 +131,9 @@ else
 fi 
 
 cd "${patchset_dir}"
-git add .
-git commit -am"feat: updates patchset from ${dev_branch}"
 
-skipInDryRun git push
+if [ -n "$(git status --porcelain)" ]; then
+  git add .
+  git commit -am"feat: updates patchset from ${dev_branch}"
+  skipInDryRun git push
+fi
