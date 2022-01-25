@@ -38,7 +38,7 @@ script_under_test="create-patches.sh"
 }
 
 @test "should prompt for git user if not specified" {
-    export -f git
+    export -f git gh
 
     # given
     export GITHUB_TOKEN="1231232"
@@ -52,7 +52,7 @@ script_under_test="create-patches.sh"
 }
 
 @test "should prompt for git user email if not specified" {
-    export -f git
+    export -f git gh
 
     # given
     export GITHUB_TOKEN="1231232"
