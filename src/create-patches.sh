@@ -113,6 +113,8 @@ fi
 git checkout "${main}"
 git checkout "${dev_branch}"
 
+mkdir -p "${patchset_dir}/${dev_branch}/" 
+
 patches=$(find "${patchset_dir}/${dev_branch}/" -maxdepth 1 -name '*.patch'| wc -l)
 patches=${patches##+(0)}
 
