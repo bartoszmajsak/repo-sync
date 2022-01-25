@@ -11,8 +11,7 @@ dryRun=false
 source_repo="${SOURCE_REPO:-}" # required
 
 main="${MAIN_BRANCH:-main}"
-dev_branch="${DEV_BRANCH:-"_______undefined"}"
-
+dev_branch="${DEV_BRANCH:-"${PULL_BASE_REF:-"_______undefined"}"}"
 patchset_repo="${PATCHSET_REPO:-}" # required
 patchset_dir="${PATCHSET_DIR:-patchset}"
 
