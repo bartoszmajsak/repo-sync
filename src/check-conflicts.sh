@@ -82,7 +82,7 @@ while test $# -gt 0; do
             shift
             ;;
     *)
-            die "unknown flag $(echo $1 | sed -e 's/^[^=]*=//g')"
+            die "$(basename "$0"): unknown flag $(echo $1 | cut -d'=' -f 1)"
             exit 1
             ;;
   esac
