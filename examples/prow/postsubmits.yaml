@@ -1,6 +1,7 @@
 postsubmits:
 
   org/repo:
+    ### Updates patchset in the dedicated repository based on changes in the development branch
     - name: patchset-updater
       decorate: true
       decoration_config:
@@ -27,6 +28,8 @@ postsubmits:
             - "--repo=github.com/org/repo"
             - "--patchset=github.com/org/patchset-repo"
   
+    ### Verifies if changes in the main branch (synced with upstream) are without conflicts by applying patches
+    ### from active development branch. When conflict occurs the pull request is opened.
     - name: check-upstream-conflicts
       decorate: true
       decoration_config:

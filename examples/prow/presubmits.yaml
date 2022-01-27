@@ -1,6 +1,7 @@
 presubmits:
 
   org/repo:
+    ### This jos is used to validate conflict resolution performed on open pull request.
     - name: patch-fix-validation
       trigger: "(?m)^/resolved"
       rerun_command: "/resolved"
