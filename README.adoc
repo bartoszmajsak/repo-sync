@@ -16,27 +16,23 @@ It's intended to be used for validation of incoming changes on the main developm
 
 == Features
 
-=== Initial patch list creation
-
-Every time a new development stream starts (new default branch) it recreates the patches based on the previous stream.
-
 ===  Patch updates
 
-This component observes changes in the `development stream branch` and creates new patches from them. Those will be then used to early detect conflicts when applied to the main branch which is synced with upstream.
+This component observes changes in the "development stream branch" and creates new patches from commits. Whenever changes in the `main` branch are synced from upstream, those patches are used to determine if there are any conflicts.
 
 === Patch verification
 
-Whenever new changes from upstream repository are synced with the main branch, list of patches are applied against them. This way it can detect issues early on.
+Whenever new changes from upstream repository are synced with the main branch, list of patches are applied against them. This way it can spot issues early on.
 
-In case of failure a new PR is opened which consists of successfully applied patches, details about the errors and instructions how to work on conflict resolution.
+In case of failure a new pull request is opened which consists of successfully applied patches, details about the errors and instructions how to work on conflict resolution.
 
 Once the conflict is resolved the verification continues on the same pull request branch.
 
-In case of the success for the entire patch list, the pull request is closed and verified commit is marked as healthy (green check on GitHub).
+In case of success for the entire patch list, the pull request is closed and verified commit on main branch is marked as healthy (green check on GitHub).
 
 == Implementation using Prow 
 
-See pre- and post-submit jobs in `examples/prow` directory for details.
+See pre- and post-submit jobs in http://test/[`examples/prow`]directory for details.
 
 == Contribution
 
