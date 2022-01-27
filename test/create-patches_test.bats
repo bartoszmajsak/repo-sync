@@ -66,6 +66,26 @@ script_under_test="create-patches.sh"
     assert_failure
 }
 
+@test "should fail when dev branch not specified" {
+    # stubs result of finding patch files
+    function find() {
+        echo "0001-patch-1"
+    }
+    export -f git find gh
+
+    # given
+    export GITHUB_TOKEN="1231232"
+    export GIT_USER="git-bot"
+    export GIT_EMAIL="git@github.com"
+    
+    # when
+    run $script_under_test
+    
+    # then
+    assert_line 'Unspecified development branch. Please set DEV_BRANCH environment variable.'
+    assert_failure
+}
+
 @test "should configure git user locally" {
     # stubs result of finding patch files
     function find() {
@@ -77,6 +97,7 @@ script_under_test="create-patches.sh"
     export GITHUB_TOKEN="1231232"
     export GIT_USER="git-bot"
     export GIT_EMAIL="git@github.com"
+    export DEV_BRANCH="dev"
     
     # when
     run $script_under_test

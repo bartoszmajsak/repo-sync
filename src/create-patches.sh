@@ -83,7 +83,7 @@ done
 
 GITHUB_TOKEN="${GITHUB_TOKEN:-$gh_token}"
 if [[ -z $GITHUB_TOKEN || $GITHUB_TOKEN == "null" ]]; then
-  echo "Please provide GITHUB_TOKEN environment variable (or pass using --token flag)" && exit 1
+  die "Please provide GITHUB_TOKEN environment variable (or pass using --token flag)"
 fi
 
 TMP_DIR=$(mktemp -d -t "patchset.XXXXXXXXXX")
@@ -106,8 +106,7 @@ configure_git "${source_repo_dir}"
 cd "${source_repo_dir}"
 
 if [[ "${dev_branch}" == "_______undefined" ]]; then
-  repo_slug="${source_repo#*/}"
-  dev_branch=$(gh api repos/"${repo_slug}" -q '.default_branch')
+  die "Unspecified development branch. Please set DEV_BRANCH environment variable."
 fi
 
 git checkout "${main}"
