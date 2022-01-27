@@ -1,5 +1,5 @@
 PROJECT_DIR:=$(shell pwd)
-SRC_DIR:=./src
+SCRIPTS_DIR:=./scripts
 
 ORG:=$(shell git remote get-url origin | cut -d':' -f 2 | cut -d'.' -f 1 | uniq | tail -n 1 | cut -d'/' -f 1)
 REPO:=$(shell git remote get-url origin | cut -d':' -f 2 | cut -d'.' -f 1 | uniq | tail -n 1 | cut -d'/' -f 2)
@@ -29,7 +29,7 @@ test:
 .PHONY: lint
 lint:
 	$(call header,"Running linters")
-	shellcheck -a --severity=error src/**
+	shellcheck -a --severity=error $(SCRIPTS_DIR)/**
 	hadolint Dockerfile.*
 
 ##@ Images
@@ -71,7 +71,7 @@ container-image--%: ## Builds the container image
 		--label "org.opencontainers.image.created=$(shell date -u +%F\ %T%z)" \
 		--network=host \
 		-t $(CONTAINER_REGISTRY)/$(CONTAINER_REPOSITORY)/$(image_name):$(image_tag) \
-		-f $(PROJECT_DIR)/Dockerfile.$(image_type) $(SRC_DIR)
+		-f $(PROJECT_DIR)/Dockerfile.$(image_type) $(SCRIPTS_DIR)
 
 .PHONY: container-images-push
 container-images-push: container-images ## Pushes latest container images to the registry
