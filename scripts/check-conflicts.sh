@@ -8,6 +8,7 @@ set -euo pipefail
 # shellcheck disable=SC1091
 source "${DIR}/func.sh"
 dryRun=false
+skipPr=false
 
 source_repo="${SOURCE_REPO:-}" # required
 
@@ -79,6 +80,10 @@ while test $# -gt 0; do
             ;;
     --dry-run)
             dryRun=true
+            shift
+            ;;
+    --skip-pr)
+            skipPr=true
             shift
             ;;
     *)
@@ -154,13 +159,14 @@ do
 
         skipInDryRun gh api --silent repos/"${source_repo#*/}"/labels -f name="do-not-merge" -f color="E11218" || true
 
+        if ! $skipPr; then
 
-        prOutput=$(skipInDryRun gh pr create \
-          --base "${patch_head}" \
-          --head  "${patch_branch}" \
-          --title "fix: resolving patchset on ${main}@${MAIN_REF}" \
-          --label "do-not-merge" \
-          --body-file - << EOF 
+                prOutput=$(skipInDryRun gh pr create \
+                        --base "${patch_head}" \
+                        --head  "${patch_branch}" \
+                        --title "fix: resolving patchset on ${main}@${MAIN_REF}" \
+                        --label "do-not-merge" \
+                        --body-file - << EOF 
 ## Why this PR?
 
 This pull request is indented for resolving conflicts between \`upstream/${main}\` and changes done on ongoing development branch \`${dev_branch}\`.
@@ -199,15 +205,17 @@ ${err_diff}
 
 EOF
 )
-        pr_nr=$(echo "${prOutput}" | grep -oP "pull/\K.*")
-        patch_label="patch/${dev_branch}/${patch_name%%-*}"
-        repo_slug="${source_repo#*/}"
-        skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || true
-        skipInDryRun gh api --silent --method POST repos/"${repo_slug}"/issues/"${pr_nr}"/labels --input - <<EOF
+                pr_nr=$(echo "${prOutput}" | grep -oP "pull/\K.*")
+                patch_label="patch/${dev_branch}/${patch_name%%-*}"
+                repo_slug="${source_repo#*/}"
+                skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || true
+                skipInDryRun gh api --silent --method POST repos/"${repo_slug}"/issues/"${pr_nr}"/labels --input - <<EOF
 { "labels": ["${patch_label}"] }
 EOF
+        fi
         exit $git_am_exit # is there a distinction between failed and errored job?
     fi
+
 done
 
 
