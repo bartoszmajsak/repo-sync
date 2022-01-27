@@ -26,7 +26,6 @@ postsubmits:
             args:
             - "--repo=github.com/org/repo"
             - "--patchset=github.com/org/patchset-repo"
-            - "--dev=release-2.1" 
   
     - name: check-upstream-conflicts
       decorate: true
@@ -53,4 +52,4 @@ postsubmits:
             args:
             - "--repo=github.com/org/repo"
             - "--patchset=github.com/org/patchset-repo"
-            - "--dev=release-2.1" ## TODO how to get the branch name?
+
