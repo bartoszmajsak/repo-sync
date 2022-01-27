@@ -126,8 +126,9 @@ MAIN_REF=$(git rev-parse HEAD)
 patch_branch="patch_update_${ID}"
 patch_head="head_${ID}"
 
-skipInDryRun git switch -c "${patch_head}"
-skipInDryRun git switch -c "${patch_branch}"
+skipInDryRun git branch "${patch_head}"
+skipInDryRun git branch "${patch_branch}"
+skipInDryRun git switch "${patch_branch}"
 
 for patch in "${patchset_dir}/${dev_branch}/"*.patch
 do
