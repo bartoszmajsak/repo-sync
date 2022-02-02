@@ -32,7 +32,7 @@ lint:
 	shellcheck -a --severity=error $(SCRIPTS_DIR)/**
 	hadolint Dockerfile.*
 
-##@ Images
+##@ Container Images
 
 GITUNTRACKEDCHANGES:=$(shell git status --porcelain --untracked-files=no)
 COMMIT:=$(shell git rev-parse --short HEAD)
