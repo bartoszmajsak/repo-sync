@@ -51,6 +51,7 @@ endif
 container-images: container-image--create-patches ## Builds container images
 container-images: container-image--validate-resolution
 container-images: container-image--check-conflicts
+container-images: container-image--propagate-patches
 
 CONTAINER_REGISTRY?=quay.io
 CONTAINER_REPOSITORY?=bmajsak
@@ -76,6 +77,7 @@ container-image--%: ## Builds the container image
 .PHONY: container-images-push
 container-images-push: container-images ## Pushes latest container images to the registry
 container-images-push: container-push--create-patches@latest
+container-images-push: container-push--propagate-patches@latest
 container-images-push: container-push--validate-resolution@latest
 container-images-push: container-push--check-conflicts@latest
 
