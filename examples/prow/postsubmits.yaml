@@ -13,7 +13,7 @@ postsubmits:
         - ^release-.*$
       spec:
         containers:
-          - image: "quay.io/bmajsak/prow-create-patches:latest"
+          - image: "quay.io/maistra-dev/prow-create-patches:latest"
             imagePullPolicy: Always
             env:
               # TODO: take from e.g. secrets. These are required
@@ -41,7 +41,7 @@ postsubmits:
         - ^main$
       spec:
         containers:
-          - image: "quay.io/bmajsak/prow-check-conflicts:latest"
+          - image: "quay.io/maistra-dev/prow-check-conflicts:latest"
             imagePullPolicy: Always
             env:
               # TODO: take from e.g. secrets. These are required

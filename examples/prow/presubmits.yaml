@@ -10,7 +10,7 @@ presubmits:
       optional: false
       spec:
         containers:
-          - image: "quay.io/bmajsak/prow-validate-resolution:latest"
+          - image: "quay.io/maistra-dev/prow-validate-resolution:latest"
             imagePullPolicy: Always
             env:
               # TODO: take from e.g. secrets. These are required

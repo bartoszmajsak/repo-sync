@@ -54,7 +54,7 @@ container-images: container-image--check-conflicts
 container-images: container-image--propagate-patches
 
 CONTAINER_REGISTRY?=quay.io
-CONTAINER_REPOSITORY?=bmajsak
+CONTAINER_REPOSITORY?=maistra-dev
 
 container-image--%: ## Builds the container image
 	$(eval image_param=$(subst container-image--,,$@))
