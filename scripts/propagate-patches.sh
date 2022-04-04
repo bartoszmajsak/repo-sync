@@ -146,10 +146,9 @@ do
 
         skipInDryRun git switch "${patch_branch}"
 
-        skipInDryRun gh api --silent repos/"${source_repo#*/}"/labels -f name="do-not-merge" -f color="E11218" || true
+        skipInDryRun gh api --silent repos/"${source_repo#*/}"/labels -f name="do-not-merge" -f color="E11218" || echo " label exists"
 
         if ! $skipPr; then
-                echo ">> test"
                 prOutput=$(skipInDryRun gh pr create \
                         --base "${patch_head}" \
                         --head  "${patch_branch}" \
@@ -198,11 +197,12 @@ EOF
                 pr_nr=$(echo "${prOutput}" | grep -oP "pull/\K.*" || echo "0")
                 patch_label="patch/${current_branch}/${patch_name%%-*}"
                 repo_slug="${source_repo#*/}"
-                skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || true
+                skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || echo " label exists"
                 skipInDryRun gh api --silent --method POST repos/"${repo_slug}"/issues/"${pr_nr}"/labels --input - <<EOF
 { "labels": ["${patch_label}"] }
 EOF
         fi
+        echo "Failed applying patches. Opened PR ${prOutput}"
         exit $git_am_exit # is there a distinction between failed and errored job?
     fi
 
