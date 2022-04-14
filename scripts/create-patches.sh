@@ -118,15 +118,17 @@ patches=$(find "${patchset_dir}/${dev_branch}/" -maxdepth 1 -name '*.patch'| wc 
 patches=${patches##+(0)}
 
 if [ "${patches}" -eq 0 ]; then
+  echo "No patches created yet for '${dev_branch}'"
   first_commit=$(git log "${main}".."${dev_branch}" --oneline --pretty=format:'%h' | tail -1)
-  if [ "$(echo "${first_commit}" | tr -d '[:space:]' | wc -l)" -gt 0 ]; then
-    skipInDryRun git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${dev_branch}"
+  if [ "$(echo "${first_commit}" | tr -d '[:space:]' | wc -w)" -gt 0 ]; then
+    git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${dev_branch}"
   fi
 else  
+  echo "Adding patches for '${dev_branch}'"
   total_commits=$(git rev-list --no-merges --count "${main}"..)
   total_commits=${total_commits##+(0)}
   start_from=$((total_commits - patches))
-  skipInDryRun git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" -o "${patchset_dir}/${dev_branch}"  
+  git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" -o "${patchset_dir}/${dev_branch}"  
 fi 
 
 cd "${patchset_dir}"
