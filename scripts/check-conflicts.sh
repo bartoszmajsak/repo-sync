@@ -99,7 +99,7 @@ if [[ -z $GITHUB_TOKEN ]]; then
 fi
 
 TMP_DIR=$(mktemp -d -t "patchset.XXXXXXXXXX")
-# trap '{ rm -rf -- "$TMP_DIR"; }' EXIT
+trap '{ rm -rf -- "$TMP_DIR"; }' EXIT
 
 cd "${TMP_DIR}"
 
