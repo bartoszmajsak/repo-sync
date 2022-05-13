@@ -1,7 +1,7 @@
 FROM quay.io/centos/centos:stream9
 
 RUN dnf -y update && \
-    dnf -y install git-2.31.1 jq-1.6 && \
+    dnf -y install git-2.31.1 jq-1.6 patchutils && \
     dnf -y clean all
 
 ENV GH_VERSION=2.9.0
