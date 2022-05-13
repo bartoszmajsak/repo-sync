@@ -128,12 +128,25 @@ else
   total_commits=$(git rev-list --no-merges --count "${main}"..)
   total_commits=${total_commits##+(0)}
   start_from=$((total_commits - patches))
-  git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" -o "${patchset_dir}/${dev_branch}"  
+  git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" -o "${patchset_dir}/${dev_branch}"
 fi 
 
 cd "${patchset_dir}"
 
-if [ -n "$(git status --porcelain)" ]; then
+if [ -n "$(git status --porcelain)" ]; then  
+  files=()
+  git add .
+  mapfile -t files <<< "$(git status -s | cut -c4-)"
+  for i in "${files[@]}"; do
+      set +e
+      found=$(lsdiff "${i}" | grep -c '.*\/vendor\/.*')
+      if [ "${found}" -ne 0 ];
+      then
+        filterdiff --exclude '*/vendor/*' "${i}" > "${i%.*}.post.patch"
+        rm "${i}"
+      fi
+      set -e
+  done;
   git add .
   git commit -am"feat: updates patchset from ${dev_branch}"
   skipInDryRun git push
