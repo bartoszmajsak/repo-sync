@@ -26,7 +26,7 @@ gh_token="null"
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
-            show_help "propagates patches from commits between previous and current development branch and pushes them to dedicated repository"
+            show_help "propagates patches from commits between previous and current development branch and pushes them to the dedicated repository"
             exit 0
             ;;
     --previous_branch*)
