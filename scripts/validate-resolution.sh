@@ -6,6 +6,10 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${DIR}/func.sh"
+
+# shellcheck disable=SC1091
+source "${DIR}/hook.sh" # holds post-processing logic
+
 dryRun=false
 
 source_repo="${SOURCE_REPO:-}" # required
@@ -155,6 +159,19 @@ do
     if [ $git_am_exit -ne 0 ];
     then
         err_diff=$(git am --show-current-patch=diff)
+        patch_hint="git checkout ${patch_branch}
+curl -L ${patch_raw_url}  | git am -k -3"
+
+        post_processing_hint=""
+        if [[ $patch ==  $post_file_ext ]]; then
+            post_processing_body="$(type post_processing | sed '1,3d;$d')"
+            post_processing_hint="Since it's a special patch which needs post processing step you should also invoke following steps:
+
+\`\`\`
+${post_processing_body}
+\`\`\`
+"
+        fi
         skipInDryRun git am --abort
         skipInDryRun git push origin "${current_branch}"        
         skipInDryRun gh pr comment "${PULL_NUMBER}" \
@@ -178,11 +195,12 @@ ${err_diff}
 Apply the patch from the patchset repository
 
 \`\`\`
-git checkout ${patch_branch}
-curl -L ${patch_raw_url}  | git am -k -3 
+${patch_hint}
 \`\`\`  
 
-resolve the conflict and push back to the branch as a single commit.
+${post_processing_hint}
+
+Then resolve the conflict and push back to the branch as a single commit.
 
 EOF
         patch_label="patch/${patch_branch}/${patch_name%%-*}"
@@ -195,6 +213,8 @@ EOF
 { "labels": ["${patch_label}"] }
 EOF
         exit $git_am_exit # is there a distinction between failed and errored job
+    elif [[ $patch == $post_file_ext ]]; then
+        post_processing
     fi
    
 done
