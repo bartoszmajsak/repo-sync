@@ -149,6 +149,19 @@ do
         skipInDryRun gh api --silent repos/"${source_repo#*/}"/labels -f name="do-not-merge" -f color="E11218" || echo " label exists"
 
         if ! $skipPr; then
+                patch_hint="git checkout ${patch_branch}
+curl -L ${patch_raw_url}  | git am -k -3"
+
+                post_processing_hint=""
+                if [[ $patch ==  $post_file_ext ]]; then
+                post_processing_body="$(type post_processing | sed '1,3d;$d')"
+                post_processing_hint="Since it's a special patch which needs post processing step you should also invoke following steps:
+
+\`\`\`
+${post_processing_body}
+\`\`\`
+        "
+                fi
                 prOutput=$(skipInDryRun gh pr create \
                         --base "${patch_head}" \
                         --head  "${patch_branch}" \
@@ -164,11 +177,12 @@ This pull request is indented for resolving conflicts in patchset between \`${pr
 Apply the patch from the patchset repository
 
 \`\`\`
-git checkout ${patch_branch}
-curl -L ${patch_raw_url}  | git am -k -3
+${patch_hint}
 \`\`\`
 
-resolve the conflict and push back to the branch as a single commit.
+${post_processing_hint}
+
+Then resolve the conflict and push back to the branch as a single commit.
 
 ### Next steps
 
@@ -204,6 +218,8 @@ EOF
         fi
         echo "Failed applying patches. Opened PR ${prOutput}"
         exit $git_am_exit # is there a distinction between failed and errored job?
+    elif [[ $patch == $post_file_ext ]]; then
+        post_processing
     fi
 
 done
