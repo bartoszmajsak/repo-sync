@@ -120,9 +120,9 @@ MAIN_REF=$(git rev-parse HEAD)
 patch_branch="patch_update_${ID}"
 patch_head="head_${ID}"
 
-skipInDryRun git branch "${patch_head}"
-skipInDryRun git branch "${patch_branch}"
-skipInDryRun git switch "${patch_branch}"
+git branch "${patch_head}"
+git branch "${patch_branch}"
+git switch "${patch_branch}"
 
 for patch in "${patchset_dir}/${current_branch}/"*.patch
 do
@@ -138,13 +138,13 @@ do
     if [ $git_am_exit -ne 0 ];
     then
         err_diff=$(git am --show-current-patch=diff)
-        skipInDryRun git am --abort
+        git am --abort
         skipInDryRun git push origin "${patch_branch}"
 
-        skipInDryRun git switch "${patch_head}"
+        git switch "${patch_head}"
         skipInDryRun git push origin "${patch_head}"
 
-        skipInDryRun git switch "${patch_branch}"
+        git switch "${patch_branch}"
 
         skipInDryRun gh api --silent repos/"${source_repo#*/}"/labels -f name="do-not-merge" -f color="E11218" || echo " label exists"
 
