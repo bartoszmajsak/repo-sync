@@ -6,6 +6,9 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${DIR}/func.sh"
+# shellcheck disable=SC1091
+source "${DIR}/hook.sh" # holds post-processing logic
+
 dryRun=false
 
 source_repo="${SOURCE_REPO:-}" # required
@@ -142,7 +145,7 @@ if [ -n "$(git status --porcelain)" ]; then
       found=$(lsdiff "${i}" | grep -c '.*\/vendor\/.*')
       if [ "${found}" -ne 0 ];
       then
-        filterdiff --exclude '*/vendor/*' "${i}" > "${i%.*}.post.patch"
+        filterdiff --exclude "${exclusion}" "${i}" > "${i%.*}.${post_file_ext}"
         rm "${i}"
       fi
       set -e
