@@ -145,7 +145,7 @@ if [ -n "$(git status --porcelain)" ]; then
       found=$(lsdiff "${i}" | grep -c '.*\/vendor\/.*')
       if [ "${found}" -ne 0 ];
       then
-        filterdiff --exclude "${exclusion}" "${i}" > "${i%.*}.${post_file_ext}"
+        filterdiff --exclude "${exclusion}" "${i}" > "${i%.*}.${post_file_ext:2}"
         rm "${i}"
       fi
       set -e
