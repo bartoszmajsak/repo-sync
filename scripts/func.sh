@@ -12,12 +12,12 @@ skipInDryRun() {
 }
 
 configure_git() {
-  GIT_USER="${GIT_USER:-}" 
+  local GIT_USER="${GIT_USER:-}" 
   if [[ -z $GIT_USER ]]; then
     echo "Please provide GIT_USER environment variable" && exit 1
   fi
 
-  GIT_EMAIL="${GIT_EMAIL:-}" 
+  local GIT_EMAIL="${GIT_EMAIL:-}" 
   if [[ -z $GIT_EMAIL ]]; then
     echo "Please provide GIT_EMAIL environment variable" && exit 1
   fi
@@ -29,6 +29,7 @@ configure_git() {
 }
 
 show_help() {
+  local usage
   usage="
 $(basename "$0") - $1
 
