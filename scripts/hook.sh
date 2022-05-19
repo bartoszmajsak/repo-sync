@@ -11,4 +11,4 @@ post_processing() {
     go mod vendor
     git add .
     git commit --amend --no-edit
-} 
+}

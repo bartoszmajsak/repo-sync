@@ -142,7 +142,6 @@ cd "${source_repo_dir}"
 patches=$(find "${patchset_dir}/${patch_branch}/" -maxdepth 1 -name '*.patch')
 total_patches=$(echo "${patches}" | wc -l)
 
-
 ### continue applying existing patches
 for patch in $(echo "${patches}" | sort | tail -"$((total_patches - failed_patch_nr + 1))")
 do
