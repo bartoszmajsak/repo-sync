@@ -4,7 +4,7 @@ RUN dnf -y update && \
     dnf -y install git-2.31.1 patchutils && \
     dnf -y clean all
 
-ENV GH_VERSION=2.9.0
+ENV GH_VERSION=2.10.1
 RUN curl -sfLO https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz && \
     tar zxf gh_${GH_VERSION}_linux_amd64.tar.gz && \
     mv gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin && chown root.root /usr/local/bin/gh && \
