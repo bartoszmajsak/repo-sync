@@ -237,6 +237,10 @@ EOF
         fi
         exit $git_am_exit # is there a distinction between failed and errored job?
     elif [[ $patch == $post_file_ext ]]; then
+        # alternatively https://git-scm.com/docs/githooks#_pre_applypatch
+        # but this would require changing git hooks path (git version >= 2.9)
+        # git config core.hooksPath .githook
+        # note: upstream does not have this folder
         post_processing
     fi
 
