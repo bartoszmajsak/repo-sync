@@ -154,10 +154,10 @@ do
         skipInDryRun git am --abort
         skipInDryRun git push origin "${patch_branch}"        
 
-        skipInDryRun git switch "${patch_head}"
+        git switch "${patch_head}"
         skipInDryRun git push origin "${patch_head}"
         
-        skipInDryRun git switch "${patch_branch}"
+        git switch "${patch_branch}"
 
         skipInDryRun gh api --silent repos/"${source_repo#*/}"/labels -f name="do-not-merge" -f color="E11218" || true
         patch_hint="git checkout ${patch_branch}
@@ -176,7 +176,10 @@ ${post_processing_body}
 
         if ! $skipPr; then
                 if git diff --quiet "${patch_head}".."${patch_branch}"; then
+                        git switch "${patch_branch}"
                         git commit --allow-empty -am'empty: marker commit to trigger conflict resolution through PR when first patch fails'        
+                        skipInDryRun git push origin "${patch_branch}"
+                        git switch - 
                 fi 
 
                 prOutput=$(skipInDryRun gh pr create \
