@@ -11,6 +11,7 @@ RUN curl -sfLO https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${
     rm -rf /root/* /root/.cache /tmp/*
 
 COPY func.sh /usr/local/bin/func.sh
+COPY hook.sh /usr/local/bin/hook.sh
 COPY validate-resolution.sh /usr/local/bin/validate-resolution
 RUN chmod +x /usr/local/bin/validate-resolution
 
