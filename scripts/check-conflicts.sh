@@ -175,6 +175,9 @@ ${post_processing_body}
         fi
 
         if ! $skipPr; then
+                if git diff --quiet "${patch_head}".."${patch_branch}"; then
+                        git commit --allow-empty -am'empty: marker commit to trigger conflict resolution through PR when first patch fails'        
+                fi 
 
                 prOutput=$(skipInDryRun gh pr create \
                         --base "${patch_head}" \
