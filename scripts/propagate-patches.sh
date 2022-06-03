@@ -95,15 +95,19 @@ source_repo_dir=$(pwd)/source_repo
 git clone "https://oauth2:${GITHUB_TOKEN}@${source_repo}.git" "${source_repo_dir}"
 configure_git "${source_repo_dir}"
 
-cd "${patchset_dir}"
-mkdir -p "${current_branch}" "${previous_branch}"
+repo_slug="${source_repo#*/}"
 
-cd "${previous_branch}"
+cd "${patchset_dir}"
+mkdir -p "${repo_slug}/${current_branch}" "${repo_slug}/${previous_branch}"
+
+cd "${repo_slug}/${previous_branch}"
 cp -R . "../${current_branch}/"
 
 ### Patchset migration
 
-cd "${patchset_dir}"
+patchset_folder="${repo_slug}/${current_branch}"
+
+cd "${patchset_folder}"
 if [ -n "$(git status --porcelain)" ]; then
   git add .
   git commit -am"feat: migrates patchset from ${previous_branch} to ${current_branch}"
@@ -124,11 +128,11 @@ git branch "${patch_head}"
 git branch "${patch_branch}"
 git switch "${patch_branch}"
 
-for patch in "${patchset_dir}/${current_branch}/"*.patch
+for patch in "${patchset_dir}/${patchset_folder}/"*.patch
 do
     [[ -e "${patch}" ]] || break  # handle the case of no *.patch files
     patch_name=$(basename "${patch}")
-    patch_raw_url="https://${patchset_repo}/blob/main/${current_branch}/${patch_name}?raw=true"
+    patch_raw_url="https://${patchset_repo}/blob/main/${patchset_folder}/${patch_name}?raw=true"
     set +e ## turn off exit on error to capture git am failure.. any other way?
     echo "Applying ${patch}"
     apply_status="$(git am "${patch}" -k -3 2>&1)"
@@ -146,7 +150,7 @@ do
 
         git switch "${patch_branch}"
 
-        skipInDryRun gh api --silent repos/"${source_repo#*/}"/labels -f name="do-not-merge" -f color="E11218" || echo " label exists"
+        skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="do-not-merge" -f color="E11218" || echo " label exists"
 
         if ! $skipPr; then
                 patch_hint="git checkout ${patch_branch}
@@ -192,7 +196,7 @@ Now you can continue verification process by invoking one of the commands:
  * \`/lint\` will run perform lint checks on the code
  * \`/resolved\` will update the patch in the patchset and continue verification process if there are more patches.
 
-You can find all the relevant patches in [patchset](https://${patchset_repo}/tree/main/${current_branch}) repository.
+You can find all the relevant patches in [patchset](https://${patchset_repo}/tree/main/${patchset_folder}) repository.
 
 ## Details
 
@@ -210,7 +214,7 @@ EOF
 
                 pr_nr=$(echo "${prOutput}" | grep -oP "pull/\K.*" || echo "0")
                 patch_label="patch/${current_branch}/${patch_name%%-*}"
-                repo_slug="${source_repo#*/}"
+                
                 skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || echo " label exists"
                 skipInDryRun gh api --silent --method POST repos/"${repo_slug}"/issues/"${pr_nr}"/labels --input - <<EOF
 { "labels": ["${patch_label}"] }

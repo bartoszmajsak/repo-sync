@@ -115,26 +115,28 @@ fi
 git checkout "${main}"
 git checkout "${dev_branch}"
 
-mkdir -p "${patchset_dir}/${dev_branch}/" 
+repo_slug="${source_repo#*/}"
+patchset_folder="${repo_slug}/${dev_branch}"
+mkdir -p "${patchset_dir}/${patchset_folder}" 
 
-patches=$(find "${patchset_dir}/${dev_branch}/" -maxdepth 1 -name '*.patch'| wc -l)
+patches=$(find "${patchset_dir}/${patchset_folder}/" -maxdepth 1 -name '*.patch'| wc -l)
 patches=${patches##+(0)}
 
 if [ "${patches}" -eq 0 ]; then
   echo "No patches created yet for '${dev_branch}'"
   first_commit=$(git log "${main}".."${dev_branch}" --oneline --pretty=format:'%h' | tail -1)
   if [ "$(echo "${first_commit}" | tr -d '[:space:]' | wc -w)" -gt 0 ]; then
-    git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${dev_branch}"
+    git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${patchset_folder}"
   fi
 else  
   echo "Adding patches for '${dev_branch}'"
   total_commits=$(git rev-list --no-merges --count "${main}"..)
   total_commits=${total_commits##+(0)}
   start_from=$((total_commits - patches))
-  git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" -o "${patchset_dir}/${dev_branch}"
+  git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" -o "${patchset_dir}/${patchset_folder}"
 fi 
 
-cd "${patchset_dir}"
+cd "${patchset_dir}/${patchset_folder}"
 
 if [ -n "$(git status --porcelain)" ]; then  
   files=()

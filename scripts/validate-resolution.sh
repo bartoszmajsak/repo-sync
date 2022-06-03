@@ -11,6 +11,7 @@ source "${DIR}/func.sh"
 source "${DIR}/hook.sh" # holds post-processing logic
 
 dryRun=false
+skipPatchMode=false
 
 source_repo="${SOURCE_REPO:-}" # required
 current_branch="${CURRENT_BRANCH:-dev}" # TODO validate
@@ -61,6 +62,10 @@ while test $# -gt 0; do
             source_repo=$(echo $1 | sed -e 's/^[^=]*=//g')
             shift
             ;;
+    -s|--skip-patch)
+           skipPatchMode=true
+           shift
+           ;;     
     --token*)
             gh_token=$(echo $1 | sed -e 's/^[^=]*=//g')
             shift
@@ -133,13 +138,20 @@ patch_branch=${label_prefix%/*}
 failed_patch_nr=${label##*/}
 failed_patch_nr=$((10#$failed_patch_nr))
 
-### update resolved patch
+patchset_folder="${repo_slug}/${patch_branch}"
 
-git format-patch -k -1 --start-number "${failed_patch_nr}" -o "${patchset_dir}/${patch_branch}"  
-cd "${patchset_dir}" && skipInDryRun git commit -am"feat: resolved in ${current_branch}" && skipInDryRun git push
+if $skipPatchMode; then
+  echo "skipping failed patch ${failed_patch_nr}"
+  failed_patch_nr=$((failed_patch_nr + 1))
+else
+  ### update resolved patch
+  git format-patch -k -1 --start-number "${failed_patch_nr}" -o "${patchset_dir}/${patchset_folder}"  
+  cd "${patchset_dir}/${patchset_dir}" && skipInDryRun git commit -am"feat: resolved in ${current_branch}" && skipInDryRun git push
+fi
+
 cd "${source_repo_dir}"
 
-patches=$(find "${patchset_dir}/${patch_branch}/" -maxdepth 1 -name '*.patch')
+patches=$(find "${patchset_dir}/${patchset_folder}" -maxdepth 1 -name '*.patch')
 total_patches=$(echo "${patches}" | wc -l)
 
 ### continue applying existing patches
@@ -148,7 +160,8 @@ do
     [[ -e "${patch}" ]] || break  # handle the case of no *.patch files
 
     patch_name=$(basename "${patch}")
-    patch_raw_url="https://${patchset_repo}/blob/main/${patch_branch}/${patch_name}?raw=true"
+
+    patch_raw_url="https://${patchset_repo}/blob/main/${patchset_folder}/${patch_name}?raw=true"
     set +e ## turn off exit on error to capture git am failure.. any other way?
     echo "Applying ${patch_name}"
     apply_status="$(git am "${patch}" -k -3 2>&1)"
@@ -158,7 +171,7 @@ do
     if [ $git_am_exit -ne 0 ];
     then
         err_diff=$(git am --show-current-patch=diff)
-        patch_hint="git checkout ${patch_branch}
+        patch_hint="git checkout ${current_branch}
 curl -L ${patch_raw_url}  | git am -k -3"
 
         post_processing_hint=""
@@ -204,11 +217,11 @@ Then resolve the conflict and push back to the branch as a single commit.
 EOF
         patch_label="patch/${patch_branch}/${patch_name%%-*}"
         # remove old label        
-        skipInDryRun gh api --silent --method DELETE repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels/"${label}"
-        skipInDryRun gh api --silent --method DELETE repos/"${repo_slug}"/labels/"${label}"
+        skipInDryRun gh api --method DELETE repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels/"${label}" || true
+        skipInDryRun gh api --method DELETE repos/"${repo_slug}"/labels/"${label}" || true
         # mark currently failing patch through new label
-        skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || true
-        skipInDryRun gh api --silent --method POST repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels --input - <<EOF
+        skipInDryRun gh api repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || true
+        skipInDryRun gh api --method POST repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels --input - <<EOF
 { "labels": ["${patch_label}"] }
 EOF
         exit $git_am_exit # is there a distinction between failed and errored job

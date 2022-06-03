@@ -122,8 +122,9 @@ cd "${source_repo_dir}"
 
 ## Start patch process
 
+repo_slug="${source_repo#*/}"
+
 if [[ "${dev_branch}" == "_______undefined" ]]; then
-  repo_slug="${source_repo#*/}"
   dev_branch=$(gh api repos/"${repo_slug}" -q '.default_branch')
 fi
 
@@ -138,11 +139,13 @@ git branch "${patch_head}"
 git branch "${patch_branch}"
 git switch "${patch_branch}"
 
-for patch in "${patchset_dir}/${dev_branch}/"*.patch
+patchset_folder="${repo_slug}/${dev_branch}"
+
+for patch in "${patchset_dir}/${patchset_folder}/"*.patch
 do
     [[ -e "${patch}" ]] || break  # handle the case of no *.patch files
     patch_name=$(basename "${patch}")
-    patch_raw_url="https://${patchset_repo}/blob/main/${dev_branch}/${patch_name}?raw=true"
+    patch_raw_url="https://${patchset_repo}/blob/main/${patchset_folder}/${patch_name}?raw=true"
     set +e ## turn off exit on error to capture git am failure.. any other way?
     echo "Applying ${patch}"
     apply_status="$(git am "${patch}" -k -3 2>&1)"
@@ -159,7 +162,7 @@ do
         
         git switch "${patch_branch}"
 
-        skipInDryRun gh api --silent repos/"${source_repo#*/}"/labels -f name="do-not-merge" -f color="E11218" || true
+        skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="do-not-merge" -f color="E11218" || true
         patch_hint="git checkout ${patch_branch}
 curl -L ${patch_raw_url}  | git am -k -3"
 
@@ -212,7 +215,7 @@ Now you can continue verification process by invoking one of the commands:
  * \`/lint\` will run perform lint checks on the code
  * \`/resolved\` will update the patch in the patchset and continue verification process if there are more patches.
 
-You can find all the relevant patches in [patchset](https://${patchset_repo}/tree/main/${dev_branch}) repository.
+You can find all the relevant patches in [patchset](https://${patchset_repo}/tree/main/${patchset_folder}) repository.
 
 ## Details
 
@@ -229,7 +232,6 @@ EOF
 )
                 pr_nr=$(echo "${prOutput}" | grep -oP "pull/\K.*")
                 patch_label="patch/${dev_branch}/${patch_name%%-*}"
-                repo_slug="${source_repo#*/}"
                 skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || true
                 skipInDryRun gh api --silent --method POST repos/"${repo_slug}"/issues/"${pr_nr}"/labels --input - <<EOF
 { "labels": ["${patch_label}"] }
