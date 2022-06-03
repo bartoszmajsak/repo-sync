@@ -142,15 +142,14 @@ if [ -n "$(git status --porcelain)" ]; then
   mapfile -t files <<< "$(git status -s | cut -c4-)"
   for i in "${files[@]}"; do
       set +e
-      found=$(lsdiff "${i}" | grep -c '.*\/vendor\/.*')
+      found=$(lsdiff "${i}" | grep -c '.*\/vendor\/.*\|go.sum')
       if [ "${found}" -ne 0 ];
       then
-        filterdiff --exclude "${exclusion}" "${i}" > "${i%.*}.${post_file_ext:2}"
+        filterdiff --exclude "${exclusion}" "${i}" > "${i%.*}.${post_file_ext:2}" # defined in hook.sh
         rm "${i}"
       fi
       set -e
   done;
   git add .
   git commit -am"feat: updates patchset from ${dev_branch}"
-  skipInDryRun git push
 fi
