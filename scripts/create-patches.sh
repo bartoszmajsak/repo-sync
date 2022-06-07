@@ -35,7 +35,7 @@ while test $# -gt 0; do
             fi
             shift
             ;;
-    --main*)
+    --main*) # it's not main branch, it's the one we are forking from - rethink the name
             main=$(echo $1 | sed -e 's/^[^=]*=//g')
             shift
             ;;
@@ -126,14 +126,14 @@ if [ "${patches}" -eq 0 ]; then
   echo "No patches created yet for '${dev_branch}'"
   first_commit=$(git log "${main}".."${dev_branch}" --oneline --pretty=format:'%h' | tail -1)
   if [ "$(echo "${first_commit}" | tr -d '[:space:]' | wc -w)" -gt 0 ]; then
-    git format-patch -k "${first_commit}~"..HEAD -o "${patchset_dir}/${patchset_folder}"
+    git format-patch -k "${first_commit}~"..HEAD --ignore-if-in-upstream -o "${patchset_dir}/${patchset_folder}"
   fi
 else  
   echo "Adding patches for '${dev_branch}'"
   total_commits=$(git rev-list --no-merges --count "${main}"..)
   total_commits=${total_commits##+(0)}
   start_from=$((total_commits - patches))
-  git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" -o "${patchset_dir}/${patchset_folder}"
+  git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" --ignore-if-in-upstream -o "${patchset_dir}/${patchset_folder}"
 fi 
 
 cd "${patchset_dir}/${patchset_folder}"
@@ -154,4 +154,5 @@ if [ -n "$(git status --porcelain)" ]; then
   done;
   git add .
   git commit -am"feat: updates patchset from ${dev_branch}"
+  skipInDryRun git push
 fi

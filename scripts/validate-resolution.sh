@@ -6,9 +6,10 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${DIR}/func.sh"
-
 # shellcheck disable=SC1091
 source "${DIR}/hook.sh" # holds post-processing logic
+# shellcheck disable=SC1091
+source "${DIR}/msgs.sh"
 
 dryRun=false
 skipPatchMode=false
@@ -184,37 +185,20 @@ ${post_processing_body}
 \`\`\`
 "
         fi
+
         skipInDryRun git am --abort
         skipInDryRun git push origin "${current_branch}"        
+
+        prComment=$(validation_failed --patch_name "${patch_name}" \
+                    --patch_raw_url "${patch_raw_url}" \
+                    --apply_status "${apply_status}" \
+                    --err_diff "${err_diff}" \
+                    --patch_hint "${patch_hint}" \
+                    --post_processing_hint "${post_processing_hint}")
+                    
         skipInDryRun gh pr comment "${PULL_NUMBER}" \
-          --body-file - << EOF 
+          --body "${prComment}"
 
-Failed applying [\`${patch_name}\`](${patch_raw_url}).
-
-## Details
-
-### Message
-\`\`\`
-${apply_status}
-\`\`\`
-### Conflict
-\`\`\`diff
-${err_diff}
-\`\`\`
-
-### Resolving the conflict
-
-Apply the patch from the patchset repository
-
-\`\`\`
-${patch_hint}
-\`\`\`  
-
-${post_processing_hint}
-
-Then resolve the conflict and push back to the branch as a single commit.
-
-EOF
         patch_label="patch/${patch_branch}/${patch_name%%-*}"
         # remove old label        
         skipInDryRun gh api --method DELETE repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels/"${label}" || true

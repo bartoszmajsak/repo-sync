@@ -9,6 +9,8 @@ set -euo pipefail
 source "${DIR}/func.sh"
 # shellcheck disable=SC1091
 source "${DIR}/hook.sh" # holds post-processing logic
+# shellcheck disable=SC1091
+source "${DIR}/msgs.sh"
 
 dryRun=false
 skipPr=false
@@ -154,7 +156,7 @@ do
 
     if [ $git_am_exit -ne 0 ]; then
         err_diff=$(git am --show-current-patch=diff)
-        skipInDryRun git am --abort
+        git am --abort
         skipInDryRun git push origin "${patch_branch}"        
 
         git switch "${patch_head}"
@@ -184,52 +186,23 @@ ${post_processing_body}
                         skipInDryRun git push origin "${patch_branch}"
                         git switch - 
                 fi 
+        
+                prMsg=$(conflict_detected --main "${main}" \
+                --dev_branch "${dev_branch}" \
+                --patchset_repo "${patchset_repo}" \
+                --patchset_folder "${patchset_folder}" \
+                --apply_status "${apply_status}" \
+                --err_diff "${err_diff}" \
+                --patch_hint "${patch_hint}" \
+                --post_processing_hint "${post_processing_hint}")
 
                 prOutput=$(skipInDryRun gh pr create \
                         --base "${patch_head}" \
                         --head  "${patch_branch}" \
                         --title "fix: resolving patchset on ${main}@${MAIN_REF}" \
                         --label "do-not-merge" \
-                        --body-file - << EOF 
-## Why this PR?
+                        --body "${prMsg}")
 
-This pull request is indented for resolving conflicts between \`upstream/${main}\` and changes done on ongoing development branch \`${dev_branch}\`.
-
-### Resolving the conflict
-
-Apply the patch from the patchset repository
-
-\`\`\`
-${patch_hint}
-\`\`\`
-
-${post_processing_hint}
-
-Then resolve the conflict and push back to the branch as a single commit.
-
-### Next steps
-
-Now you can continue verification process by invoking one of the commands:
-
- * \`/test\` will run unit tests
- * \`/lint\` will run perform lint checks on the code
- * \`/resolved\` will update the patch in the patchset and continue verification process if there are more patches.
-
-You can find all the relevant patches in [patchset](https://${patchset_repo}/tree/main/${patchset_folder}) repository.
-
-## Details
-
-### Message
-\`\`\`
-${apply_status}
-\`\`\`
-### Conflict
-\`\`\`diff
-${err_diff}
-\`\`\`
-
-EOF
-)
                 pr_nr=$(echo "${prOutput}" | grep -oP "pull/\K.*")
                 patch_label="patch/${dev_branch}/${patch_name%%-*}"
                 skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${patch_label}" -f color="c0ff00" || true

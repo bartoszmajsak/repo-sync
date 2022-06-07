@@ -7,6 +7,9 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${DIR}/func.sh"
+# shellcheck disable=SC1091
+source "${DIR}/msgs.sh"
+
 dryRun=false
 skipPr=false
 
@@ -166,51 +169,22 @@ ${post_processing_body}
 \`\`\`
         "
                 fi
+
+                propagationFailed=$(patch_propagation_failed --previous_branch "${previous_branch}" \
+                        --current_branch "${current_branch}" \
+                        --patchset_repo "${patchset_repo}" \
+                        --patchset_folder "${patchset_folder}" \
+                        --apply_status "${apply_status}" \
+                        --err_diff "${err_diff}" \
+                        --patch_hint "${patch_hint}" \
+                        --post_processing_hint "${post_processing_hint}")
+                        
                 prOutput=$(skipInDryRun gh pr create \
                         --base "${patch_head}" \
                         --head  "${patch_branch}" \
                         --title "fix: resolving patchset on ${current_branch}@${MAIN_REF}" \
                         --label "do-not-merge" \
-                        --body-file - << EOF
-## Why this PR?
-
-This pull request is indented for resolving conflicts in patchset between \`${previous_branch}\` and changes done on ongoing development branch \`${current_branch}\`.
-
-### Resolving the conflict
-
-Apply the patch from the patchset repository
-
-\`\`\`
-${patch_hint}
-\`\`\`
-
-${post_processing_hint}
-
-Then resolve the conflict and push back to the branch as a single commit.
-
-### Next steps
-
-Now you can continue verification process by invoking one of the commands:
-
- * \`/test\` will run unit tests
- * \`/lint\` will run perform lint checks on the code
- * \`/resolved\` will update the patch in the patchset and continue verification process if there are more patches.
-
-You can find all the relevant patches in [patchset](https://${patchset_repo}/tree/main/${patchset_folder}) repository.
-
-## Details
-
-### Message
-\`\`\`
-${apply_status}
-\`\`\`
-### Conflict
-\`\`\`diff
-${err_diff}
-\`\`\`
-
-EOF
-)
+                        --body "${propagationFailed}")
 
                 pr_nr=$(echo "${prOutput}" | grep -oP "pull/\K.*" || echo "0")
                 patch_label="patch/${current_branch}/${patch_name%%-*}"

@@ -12,6 +12,8 @@ RUN curl -sfLO https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${
 
 COPY func.sh /usr/local/bin/func.sh
 COPY hook.sh /usr/local/bin/hook.sh
+COPY msgs.sh /usr/local/bin/msgs.sh
+
 COPY create-patches.sh /usr/local/bin/create-patches
 RUN chmod +x /usr/local/bin/create-patches
 
