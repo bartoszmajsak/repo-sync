@@ -119,22 +119,25 @@ repo_slug="${source_repo#*/}"
 patchset_folder="${repo_slug}/${dev_branch}"
 mkdir -p "${patchset_dir}/${patchset_folder}" 
 
-patches=$(find "${patchset_dir}/${patchset_folder}/" -maxdepth 1 -name '*.patch'| wc -l)
+patches=$(find "${patchset_dir}/${patchset_folder}/" -maxdepth 1 -name '*.patch' -printf x | wc -c)
 patches=${patches##+(0)}
 
 if [ "${patches}" -eq 0 ]; then
-  echo "No patches created yet for '${dev_branch}'"
-  first_commit=$(git log "${main}".."${dev_branch}" --oneline --pretty=format:'%h' | tail -1)
-  if [ "$(echo "${first_commit}" | tr -d '[:space:]' | wc -w)" -gt 0 ]; then
-    git format-patch -k "${first_commit}~"..HEAD --ignore-if-in-upstream -o "${patchset_dir}/${patchset_folder}"
-  fi
-else  
-  echo "Adding patches for '${dev_branch}'"
-  total_commits=$(git rev-list --no-merges --count "${main}"..)
-  total_commits=${total_commits##+(0)}
-  start_from=$((total_commits - patches))
-  git format-patch -k HEAD~"${start_from}" --start-number "$((patches + 1))" --ignore-if-in-upstream -o "${patchset_dir}/${patchset_folder}"
+  echo "No patches created yet for '${patchset_folder}'"
 fi 
+
+mapfile -t commits <<< "$(git cherry "${main}" | grep '+' | cut -d' ' -f 2)" # This way we only take commits unique to dev branch which cannot be skipped (marked with + instead of -)
+commits=("${commits[@]:patches}") ## Take only new commits since last time the patchset was updated
+
+if [ "${#commits[@]}" -eq 0 ]; then
+  echo "No new commits... nothing to do... moving on :)"
+  exit 0
+fi
+
+for index in "${!commits[@]}"; do
+  commit="${commits[$index]}"
+  git format-patch -k -1 -M -C "${commit}"~.."${commit}" --start-number $((index+patches+1)) --ignore-if-in-upstream -o "${patchset_dir}/${patchset_folder}"
+done;
 
 cd "${patchset_dir}/${patchset_folder}"
 
