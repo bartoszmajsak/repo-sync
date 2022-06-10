@@ -13,7 +13,7 @@ dryRun=false
 
 source_repo="${SOURCE_REPO:-}" # required
 
-main="${MAIN_BRANCH:-main}"
+source="${SOURCE_BRANCH:-source}" # branch from which dev branch has been created (typically release-x.y branch which gets hotfixes ported back from master)
 dev_branch="${DEV_BRANCH:-"${PULL_BASE_REF:-"_______undefined"}"}"
 patchset_repo="${PATCHSET_REPO:-}" # required
 patchset_dir="${PATCHSET_DIR:-patchset}"
@@ -26,17 +26,17 @@ while test $# -gt 0; do
             show_help "creates patches from commits on the development branch and pushes them to dedicated repository"
             exit 0
             ;;
-    -m)
+    -s)
             shift
             if test $# -gt 0; then
-              main=$1
+              source=$1
             else
-              die "Please provide branch name"
+              die "Please provide source branch name"
             fi
             shift
             ;;
-    --main*) # it's not main branch, it's the one we are forking from - rethink the name
-            main=$(echo $1 | sed -e 's/^[^=]*=//g')
+    --source*) # it's not main branch, it's the one we are forking from - rethink the name
+            source=$(echo $1 | sed -e 's/^[^=]*=//g')
             shift
             ;;
     --dev*)
@@ -112,7 +112,7 @@ if [[ "${dev_branch}" == "_______undefined" ]]; then
   die "Unspecified development branch. Please set DEV_BRANCH environment variable."
 fi
 
-git checkout "${main}"
+git checkout "${source}"
 git checkout "${dev_branch}"
 
 repo_slug="${source_repo#*/}"
@@ -126,7 +126,7 @@ if [ "${patches}" -eq 0 ]; then
   echo "No patches created yet for '${patchset_folder}'"
 fi 
 
-mapfile -t commits <<< "$(git cherry "${main}" | grep '+' | cut -d' ' -f 2)" # This way we only take commits unique to dev branch which cannot be skipped (marked with + instead of -)
+mapfile -t commits <<< "$(git cherry "${source}" | grep '+' | cut -d' ' -f 2)" # This way we only take commits unique to dev branch which cannot be skipped (marked with + instead of -)
 commits=("${commits[@]:patches}") ## Take only new commits since last time the patchset was updated
 
 if [ "${#commits[@]}" -eq 0 ]; then
