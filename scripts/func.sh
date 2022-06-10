@@ -65,3 +65,22 @@ Example:
 
   echo "$usage"
 }
+
+function trim() {
+  while [ $# -gt 0 ]; do
+    if [[ $1 == "--"* ]]; then
+        v="${1/--/}"
+        local "$v"="$2"
+        shift
+    fi
+    shift
+  done
+
+  if [ "$(echo "${source}" | wc -l)" -gt "${max_lines}" ]; then
+    echo "${source}" | sed -e "${max_lines}"'{$!N;s/\n.*/\n---\n\n'"${trim_msg}"'/' -e 'q}'
+  else
+    echo "${source}"
+  fi
+
+  return 0
+}

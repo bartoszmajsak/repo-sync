@@ -126,6 +126,7 @@ Failed applying [\`${patch_name}\`](${patch_raw_url}).
 \`\`\`
 ${apply_status}
 \`\`\`
+
 ### Conflict
 \`\`\`diff
 ${err_diff}

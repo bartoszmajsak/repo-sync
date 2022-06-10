@@ -171,7 +171,7 @@ do
 
     if [ $git_am_exit -ne 0 ];
     then
-        err_diff=$(git am --show-current-patch=diff)
+        err_diff=$(trim --source "$(git am --show-current-patch=diff)" --trim_msg "[...] diff too long. Please check the details while resolving it." --max_lines 100 || true) # not sure why it ends with PIPE error
         patch_hint="git checkout ${current_branch}
 curl -L ${patch_raw_url}  | git am -k -3"
 
@@ -195,7 +195,7 @@ ${post_processing_body}
                     --err_diff "${err_diff}" \
                     --patch_hint "${patch_hint}" \
                     --post_processing_hint "${post_processing_hint}")
-                    
+
         skipInDryRun gh pr comment "${PULL_NUMBER}" \
           --body "${prComment}"
 

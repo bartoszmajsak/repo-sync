@@ -155,7 +155,7 @@ do
     set -e
 
     if [ $git_am_exit -ne 0 ]; then
-        err_diff=$(git am --show-current-patch=diff)
+        err_diff=$(trim --source "$(git am --show-current-patch=diff)" --trim_msg "[...] diff too long. Please check the details while resolving it." --max_lines 100 || true) # not sure why it ends with PIPE error
         git am --abort
         skipInDryRun git push origin "${patch_branch}"        
 
@@ -185,8 +185,8 @@ ${post_processing_body}
                         git commit --allow-empty -am'empty: marker commit to trigger conflict resolution through PR when first patch fails'        
                         skipInDryRun git push origin "${patch_branch}"
                         git switch - 
-                fi 
-        
+                fi
+
                 prMsg=$(conflict_detected --main "${main}" \
                 --dev_branch "${dev_branch}" \
                 --patchset_repo "${patchset_repo}" \
