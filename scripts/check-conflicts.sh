@@ -155,7 +155,7 @@ do
     set -e
 
     if [ $git_am_exit -ne 0 ]; then
-        err_diff=$(trim --source "$(git am --show-current-patch=diff)" --trim_msg "[...] diff too long. Please check the details while resolving it." --max_lines 100 || true) # not sure why it ends with PIPE error
+        err_diff=$(trim --source "$(git diff)" --trim_msg "[...] diff too long. Please check the details while resolving it." --max_lines 100 || true) # not sure why it ends with PIPE error
         git am --abort
         skipInDryRun git push origin "${patch_branch}"        
 
