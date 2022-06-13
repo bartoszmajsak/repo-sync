@@ -123,6 +123,11 @@ $pr
 EOF
 )
 
+base_branch=$(jq -r '.base.ref' - << EOF
+$pr
+EOF
+)
+
 git switch "${current_branch}"
 
 label=$(jq -c -r '.labels[] | select(.name | contains("patch/")) | .name' - << EOF
@@ -231,4 +236,5 @@ EOF
 skipInDryRun gh api --silent --method DELETE repos/"${repo_slug}"/issues/"${PULL_NUMBER}"/labels/"${label}"
 skipInDryRun gh pr close "${PULL_NUMBER}"
 
-### TODO remove branches
+skipInDryRun git push origin ":${current_branch}"
+skipInDryRun git push origin ":${base_branch}"
