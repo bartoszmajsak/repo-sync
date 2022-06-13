@@ -165,8 +165,12 @@ do
         git switch "${patch_branch}"
 
         skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="do-not-merge" -f color="E11218" || true
-        patch_hint="git checkout ${patch_branch}
-curl -L ${patch_raw_url}  | git am -k -3"
+        patch_hint="Apply the [failed patch](${patch_raw_url}) from the patchset repository
+
+\`\`\`
+git checkout ${patch_branch}
+curl -L ${patch_raw_url}  | git am -k -3
+\`\`\`"
 
         post_processing_hint=""
         if [[ $patch ==  $post_file_ext ]]; then

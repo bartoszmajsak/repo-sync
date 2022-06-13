@@ -172,8 +172,12 @@ do
     if [ $git_am_exit -ne 0 ];
     then
         err_diff=$(trim --source "$(git diff)" --trim_msg "[...] diff too long. Please check the details while resolving it." --max_lines 100 || true) # not sure why it ends with PIPE error
-        patch_hint="git checkout ${current_branch}
-curl -L ${patch_raw_url}  | git am -k -3"
+        patch_hint="Apply the [failed patch](${patch_raw_url}) from the patchset repository
+
+\`\`\`
+git checkout ${patch_branch}
+curl -L ${patch_raw_url}  | git am -k -3
+\`\`\`"
 
         post_processing_hint=""
         if [[ $patch ==  $post_file_ext ]]; then

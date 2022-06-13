@@ -22,9 +22,7 @@ This pull request is indented for resolving conflicts in patchset between \`${pr
 
 Apply the patch from the patchset repository
 
-\`\`\`
 ${patch_hint}
-\`\`\`
 
 ${post_processing_hint}
 
@@ -72,11 +70,7 @@ This pull request is indented for resolving conflicts between \`upstream/${main}
 
 ### Resolving the conflict
 
-Apply the patch from the patchset repository
-
-\`\`\`
 ${patch_hint}
-\`\`\`
 
 ${post_processing_hint}
 
@@ -134,11 +128,7 @@ ${err_diff}
 
 ### Resolving the conflict
 
-Apply the patch from the patchset repository
-
-\`\`\`
 ${patch_hint}
-\`\`\`  
 
 ${post_processing_hint}
 
