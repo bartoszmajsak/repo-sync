@@ -35,7 +35,7 @@ while test $# -gt 0; do
             fi
             shift
             ;;
-    --source*) # it's not main branch, it's the one we are forking from - rethink the name
+    --source*)
             source=$(echo $1 | sed -e 's/^[^=]*=//g')
             shift
             ;;
