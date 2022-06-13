@@ -178,6 +178,13 @@ ${post_processing_body}
 \`\`\`
         "
                 fi
+                
+                if git diff --quiet "${patch_head}".."${patch_branch}"; then
+                        git switch "${patch_branch}"
+                        git commit --allow-empty -am'empty: marker commit to trigger conflict resolution through PR when first patch fails'        
+                        skipInDryRun git push origin "${patch_branch}"
+                        git switch - 
+                fi
 
                 propagationFailed=$(patch_propagation_failed --previous_branch "${previous_branch}" \
                         --current_branch "${current_branch}" \
