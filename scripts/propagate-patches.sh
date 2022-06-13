@@ -15,13 +15,15 @@ source "${DIR}/msgs.sh"
 dryRun=false
 skipPr=false
 
+delimiter="_-_"
 PULL_BASE_REF="${PULL_BASE_REF:-}"
 if [[ -z $PULL_BASE_REF ]]; then
-  die "Please provide PULL_BASE_REF environment variable in old_branch:new_branch format."
+  die "Please provide PULL_BASE_REF environment variable in old_branch${delimiter}new_branch format."
 fi
 
-previous_branch="${PULL_BASE_REF%:*}"
-current_branch="${PULL_BASE_REF#*:}"
+previous_branch="${PULL_BASE_REF%${delimiter}*}"
+current_branch="${PULL_BASE_REF#*${delimiter}}"
+
 patchset_repo="${PATCHSET_REPO:-}" # required
 source_repo="${SOURCE_REPO:-}" # required
 patchset_dir="${PATCHSET_DIR:-patchset}"
