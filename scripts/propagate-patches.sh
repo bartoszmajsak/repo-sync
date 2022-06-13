@@ -6,6 +6,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 set -euo pipefail
 
 # shellcheck disable=SC1091
+source "${DIR}/hook.sh"
+# shellcheck disable=SC1091
 source "${DIR}/func.sh"
 # shellcheck disable=SC1091
 source "${DIR}/msgs.sh"
@@ -106,8 +108,9 @@ mkdir -p "${repo_slug}/${current_branch}" "${repo_slug}/${previous_branch}"
 cd "${repo_slug}/${previous_branch}"
 cp -R . "../${current_branch}/"
 
-### Patchset migration
+cd - 
 
+### Patchset migration
 patchset_folder="${repo_slug}/${current_branch}"
 
 cd "${patchset_folder}"
@@ -156,7 +159,7 @@ do
         skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="do-not-merge" -f color="E11218" || echo " label exists"
 
         if ! $skipPr; then
-                        patch_hint="Apply the [failed patch](${patch_raw_url}) from the patchset repository
+                patch_hint="Apply the [failed patch](${patch_raw_url}) from the patchset repository
 
 \`\`\`
 git checkout ${patch_branch}
