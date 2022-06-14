@@ -161,6 +161,7 @@ do
         skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="do-not-merge" -f color="E11218" || echo " label exists"
 
         if ! $skipPr; then
+                skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="patch-migration" -f color="c934eb" || echo " label exists"
                 patch_hint="Apply the [failed patch](${patch_raw_url}) from the patchset repository
 
 \`\`\`
