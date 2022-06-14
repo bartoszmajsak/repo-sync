@@ -2,6 +2,7 @@
 
 ID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PAGER=more
 
 set -euo pipefail
 
@@ -85,6 +86,15 @@ if [[ -z $GITHUB_TOKEN || $GITHUB_TOKEN == "null" ]]; then
   die "Please provide GITHUB_TOKEN environment variable (or pass using --token flag)"
 fi
 
+repo_slug="${source_repo#*/}"
+migrationLabel="patch-migration"
+pendingMigrationPR=$(gh pr list -R bartoszmajsak/istio --label "${migrationLabel}" --json id -q '. | length')
+
+if [ $pendingMigrationPR -gt 0 ]; then
+  echo "Pending PR with label '${migrationLabel}'. Take care of it first!"
+  exit 1
+fi
+
 TMP_DIR=$(mktemp -d -t "patchset.XXXXXXXXXX")
 trap '{ rm -rf -- "$TMP_DIR"; }' EXIT
 
@@ -101,8 +111,6 @@ source_repo_dir=$(pwd)/source_repo
 
 git clone "https://oauth2:${GITHUB_TOKEN}@${source_repo}.git" "${source_repo_dir}"
 configure_git "${source_repo_dir}"
-
-repo_slug="${source_repo#*/}"
 
 cd "${patchset_dir}"
 mkdir -p "${repo_slug}/${current_branch}" "${repo_slug}/${previous_branch}"
@@ -161,7 +169,7 @@ do
         skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="do-not-merge" -f color="E11218" || echo " label exists"
 
         if ! $skipPr; then
-                skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="patch-migration" -f color="c934eb" || echo " label exists"
+                skipInDryRun gh api --silent repos/"${repo_slug}"/labels -f name="${migrationLabel}" -f color="c934eb" || echo " label exists"
                 patch_hint="Apply the [failed patch](${patch_raw_url}) from the patchset repository
 
 \`\`\`
