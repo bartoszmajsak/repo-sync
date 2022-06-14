@@ -88,10 +88,10 @@ fi
 
 repo_slug="${source_repo#*/}"
 migrationLabel="patch-migration"
-pendingMigrationPR=$(gh pr list -R bartoszmajsak/istio --label "${migrationLabel}" --json id -q '. | length')
+pendingMigrationPRs=$(gh pr list -R "${repo_slug}" --label "${migrationLabel}" --json url)
 
-if [ $pendingMigrationPR -gt 0 ]; then
-  echo "Pending PR with label '${migrationLabel}'. Take care of it first!"
+if [ $(echo "${pendingMigrationPRs}" | jq '. | length') -gt 0 ]; then
+  echo "There's pending PR with label '${migrationLabel}' - $(echo "${pendingMigrationPRs}" | jq '.[0].url') . Take care of it first!"
   exit 1
 fi
 
